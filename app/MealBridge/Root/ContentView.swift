@@ -10,42 +10,39 @@ import SwiftUI
 struct ContentView: View {
     @State private var navigationManager = NavigationManager()
     @State private var selectedTab = 0
-    @Binding var isNGO: Bool
-    @Binding var isRestraunt: Bool
+    @EnvironmentObject var authManager: AuthManager
     
     var body: some View {
-        NavigationStack(path: $navigationManager.path) {
-            ZStack {
-                Color.offWhite.ignoresSafeArea()
-                
-                VStack(spacing: 0) {
-                    Group {
-                        switch selectedTab {
-                        case 0:
-                            HomeView()
-                        case 1:
-                            DashboardView()
-                        case 2:
-                            ChatListView()
-                        default:
-                            HomeView()
-                        }
+        ZStack {
+            Color.offWhite.ignoresSafeArea()
+            
+            VStack(spacing: 0) {
+                Group {
+                    switch selectedTab {
+                    case 0:
+                        HomeView()
+                    case 1:
+                        DashboardView()
+                    case 2:
+                        ChatListView()
+                    default:
+                        HomeView()
                     }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    
-                    // Custom Tab Bar
-                    NeubrutalismTabBar(
-                        selectedTab: $selectedTab,
-                        isNGO: isNGO,
-                        isRestaurant: isRestraunt
-                    )
                 }
-            }
-            .navigationDestination(for: AppDestination.self) { destination in
-                destinationView(for: destination)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                
+                // Custom Tab Bar
+                NeubrutalismTabBar(
+                    selectedTab: $selectedTab,
+                    isNGO: authManager.currentUser?.isNGO ?? false,
+                    isRestaurant: authManager.currentUser?.isRestaurant ?? false
+                )
             }
         }
-        .environment(navigationManager)
+        .onAppear {
+            // Refresh user profile and fetch initial data
+            authManager.refreshUserProfile()
+        }
     }
     
     @ViewBuilder
@@ -57,11 +54,11 @@ struct ContentView: View {
         case .register:
             RegisterView()
         case .onboarding:
-            OnboardingView(isNGO: $isNGO, isRestraunt: $isRestraunt)
+            OnboardingView()
             
             // User Type Selection
         case .userTypeSelection:
-            UserTypeSelectionView(isNGO: $isNGO, isRestraunt: $isRestraunt)
+            UserTypeSelectionView()
             
             // Restaurant Flow
         case .restaurantDashboard:
@@ -111,5 +108,6 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView(isNGO: .constant(false), isRestraunt: .constant(false))
+    ContentView()
+        .environmentObject(AuthManager.shared)
 }

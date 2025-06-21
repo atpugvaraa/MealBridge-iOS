@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct UserTypeSelectionView: View {
-    @Binding var isNGO: Bool
-    @Binding var isRestraunt: Bool
+    @EnvironmentObject var authManager: AuthManager
+    @Environment(NavigationManager.self) var navigate
     
     var body: some View {
         VStack(spacing: 0) {
@@ -30,7 +30,7 @@ struct UserTypeSelectionView: View {
                                 .fill(.atomicTangerine)
                                 .border(.black, width: 1)
                             
-                            if isNGO {
+                            if authManager.currentUser?.isNGO == true {
                                 Rectangle()
                                     .fill(.black.opacity(0.2))
                             }
@@ -41,17 +41,13 @@ struct UserTypeSelectionView: View {
                             .fontWeight(.semibold)
                             .fontWidth(.expanded)
                     }
-                    .offset(x: isNGO ? 2 : -2, y: isNGO ? 2 : -2)
-                    .animation(.snappy, value: isNGO)
+                    .offset(x: (authManager.currentUser?.isNGO == true) ? 2 : -2, y: (authManager.currentUser?.isNGO == true) ? 2 : -2)
+                    .animation(.snappy, value: authManager.currentUser?.isNGO)
                 }
                 .frame(height: 48)
                 .onTapGesture {
-                    if isRestraunt {
-                        isRestraunt = false
-                        isNGO = true
-                    } else {
-                        isNGO.toggle()
-                    }
+                    // Navigate to NGO specific flow
+                    navigate.to(.ngoDashboard)
                 }
                 
                 ZStack {
@@ -65,7 +61,7 @@ struct UserTypeSelectionView: View {
                                 .fill(.steelBlue)
                                 .border(.black, width: 1)
                             
-                            if isRestraunt {
+                            if authManager.currentUser?.isRestaurant == true {
                                 Rectangle()
                                     .fill(.black.opacity(0.2))
                             }
@@ -76,17 +72,13 @@ struct UserTypeSelectionView: View {
                             .fontWeight(.semibold)
                             .fontWidth(.expanded)
                     }
-                    .offset(x: isRestraunt ? 2 : -2, y: isRestraunt ? 2 : -2)
-                    .animation(.snappy, value: isRestraunt)
+                    .offset(x: (authManager.currentUser?.isRestaurant == true) ? 2 : -2, y: (authManager.currentUser?.isRestaurant == true) ? 2 : -2)
+                    .animation(.snappy, value: authManager.currentUser?.isRestaurant)
                 }
                 .frame(height: 48)
                 .onTapGesture {
-                    if isNGO {
-                        isNGO = false
-                        isRestraunt = true
-                    } else {
-                        isRestraunt.toggle()
-                    }
+                    // Navigate to Restaurant specific flow
+                    navigate.to(.restaurantDashboard)
                 }
             }
             .frame(maxWidth: .infinity)
@@ -96,5 +88,6 @@ struct UserTypeSelectionView: View {
 }
 
 #Preview {
-    UserTypeSelectionView(isNGO: .constant(false), isRestraunt: .constant(false))
+    UserTypeSelectionView()
+        .environmentObject(AuthManager.shared)
 }

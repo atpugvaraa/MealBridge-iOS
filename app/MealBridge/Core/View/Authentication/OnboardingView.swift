@@ -9,76 +9,103 @@ import SwiftUI
 
 struct OnboardingView: View {
     @AppStorage("isOnboarding") var isOnboarding = true
-    @Binding var isNGO: Bool
-    @Binding var isRestraunt: Bool
+    @Environment(NavigationManager.self) var navigate
     
     var body: some View {
         ZStack {
-            Color.offWhite.edgesIgnoringSafeArea(.all)
+            Color.offWhite.ignoresSafeArea()
             
-            VStack(spacing: 24) {
-                Spacer()
+            VStack(spacing: 32) {
                 Spacer()
                 
-                HStack {
-                    VStack(alignment: .leading, spacing: 12) {
-                        VStack(alignment: .leading) {
-                            Text("Welcome to")
-                                .font(.title2)
-                                .fontWeight(.semibold)
-                            
-                            Text("MealBridge")
-                                .font(.largeTitle)
-                                .fontWeight(.bold)
-                        }
-                        .foregroundStyle(.black)
-                        .fontWidth(.expanded)
-                        
-                        
-                        VStack(alignment: .leading) {
-                            Text("Bridging the Gap Between")
-                            Text("Surplus and Scarcity.")
-                        }
-                        .font(.body)
-                        .fontWeight(.medium)
-                        .foregroundColor(Color.black.opacity(0.8))
-                    }
-                    .padding(.top, -128)
-                    .padding(.bottom, 64)
+                // App Logo/Icon
+                ZStack {
+                    Circle()
+                        .fill(Color.black)
+                        .frame(width: 120, height: 120)
+                        .offset(x: 3, y: 3)
                     
-                    Spacer()
+                    Circle()
+                        .fill(Color.atomicTangerine)
+                        .frame(width: 120, height: 120)
+                        .overlay(
+                            Circle()
+                                .stroke(.black, lineWidth: 3)
+                        )
+                    
+                    Image(systemName: "heart.fill")
+                        .font(.system(size: 40, weight: .bold))
+                        .foregroundColor(.black)
                 }
-                .padding()
                 
-                UserTypeSelectionView(isNGO: $isNGO, isRestraunt: $isRestraunt)
+                // Title and Description
+                VStack(spacing: 16) {
+                    Text("MealBridge")
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
+                        .fontWidth(.expanded)
+                        .foregroundColor(.black)
+                    
+                    Text("Connecting surplus food with those in need")
+                        .font(.headline)
+                        .fontWeight(.medium)
+                        .foregroundColor(.black.opacity(0.7))
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 32)
+                }
                 
                 Spacer()
+                
+                // Action Buttons
+                VStack(spacing: 16) {
+                    Button {
+                        navigate.to(.register)
+                    } label: {
+                        ZStack {
+                            Rectangle()
+                                .foregroundStyle(.black)
+                                .offset(x: 3, y: 3)
+                            
+                            Text("Get Started")
+                                .font(.headline)
+                                .fontWeight(.bold)
+                                .fontWidth(.expanded)
+                                .foregroundColor(.black)
+                                .frame(maxWidth: .infinity)
+                                .padding(18)
+                                .background(.pistachio)
+                                .overlay(
+                                    Rectangle()
+                                        .stroke(.black, lineWidth: 2)
+                                )
+                        }
+                    }
+                    .padding(.horizontal, 32)
+                    
+                    Button {
+                        navigate.to(.login)
+                    } label: {
+                        Text("Already have an account? Sign In")
+                            .font(.subheadline)
+                            .fontWeight(.semibold)
+                            .foregroundColor(.steelBlue)
+                    }
+                }
                 
                 Button {
                     isOnboarding = false
                 } label: {
-                    ZStack {
-                        Circle()
-                            .fill(.black)
-                            .offset(x: 2, y: 2)
-                        
-                        Circle()
-                            .fill(!isNGO && !isRestraunt ? .gray :  Color.pistachio)
-                            .stroke(.black, lineWidth: 1)
-
-                        Image(systemName: "arrow.right")
-                            .foregroundColor(.black)
-                    }
-                    .frame(width: 50)
+                    Text("Skip for now")
+                        .font(.caption)
+                        .foregroundColor(.black.opacity(0.5))
                 }
-                .disabled(!isNGO && !isRestraunt)
-                
-                Spacer()
+                .padding(.bottom, 32)
             }
         }
+        .navigationBarBackButtonHidden(true)
     }
 }
 
 #Preview {
-    OnboardingView(isNGO: .constant(false), isRestraunt: .constant(false))
+    OnboardingView()
 }
